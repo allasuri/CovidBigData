@@ -7,10 +7,10 @@ from tweepy import Stream
 from tweepy.streaming import StreamListener
 
 # TWITTER API CONFIGURATIONS
-consumer_key = "zOQ2oHkrOnNtNrGQTBdK5XYQS"
-consumer_secret = "eu6s35Tp7qVTHGu0l6LwgiRVpW4XOF1hrpYO17Za6m2PTd07VS"
-access_token = "1213654490034790401-5R0KypQGMcBimW0mgXgwOvGML4DxaD"
-access_secret = "97l3vdYcOiLg3wVP5rDc73GU2pPIhoP82o6HvPhN1BdyH"
+consumer_key = ""
+consumer_secret = ""
+access_token = ""
+access_secret = ""
 
 # TWITTER API AUTH
 auth = OAuthHandler(consumer_key, consumer_secret)
