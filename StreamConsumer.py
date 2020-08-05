@@ -1,0 +1,46 @@
+from kafka import KafkaConsumer
+import json
+import re
+from elasticsearch import Elasticsearch
+from textblob import TextBlob
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+es = Elasticsearch()
+analyzer = SentimentIntensityAnalyzer()
+def main():
+    '''
+    main function initiates a kafka consumer, initialize the tweetdata database.
+    Consumer consumes tweets from producer extracts features, cleanses the tweet text,
+    calculates sentiments and loads the data into postgres database
+    '''
+    # set-up a Kafka consumer
+    consumer = KafkaConsumer("twitter")
+    for msg in consumer:
+
+        dict_data = json.loads(msg.value)
+        tweet = TextBlob(dict_data["text"])
+        print(tweet)
+        scores=analyzer.polarity_scores(' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",dict_data["text"]).split()))
+        #del scores['compound']
+        #print(scores)
+        sentiment=sorted(scores,key=scores.get).pop()
+        if scores['compound']>0:
+                a="Positive"
+                print("Positive")
+        elif scores['compound']<0:
+                a="Negative"
+                print("Nagative")
+        elif scores['compound']==0:
+                a="Neutral"
+                print("Neutral")
+        
+        # add text and sentiment info to elasticsearch
+        es.index(index="tweet",
+        	doc_type="test-type",
+                body={"author": dict_data["user"]["screen_name"],
+                        "date": dict_data["created_at"],
+                        "message": dict_data["text"],
+                        "sentiment":a})
+        print('\n')
+
+if __name__ == "__main__":
+    main()
